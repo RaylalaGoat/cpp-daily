@@ -1,107 +1,89 @@
 // =========================================================
-// Day1:型とsizeof
+// Day2:整数と割り算とstatic_cast
 //
-// 制作者:h		日付：2026/11/11
+// 制作者:h		日付：11/14
 // =========================================================
-
-#include <cstdint>
 #include <iostream>
-#include <limits>
-#include <iomanip>
+#include <vector>
 
-int main() {
-    // =====================================================
-    // 型が何バイト使うか確認
-    // =====================================================
-    std::cout << "=1= sizeof\n";
+int main()
+{
+    const int totalDamage = 7;
+    const int hitCount = 2;
 
-    std::cout << "bool          : " << sizeof(bool) << " byte\n";
-    std::cout << "char          : " << sizeof(char) << " byte\n";
-    std::cout << "short         : " << sizeof(short) << " byte\n";
-    std::cout << "int           : " << sizeof(int) << " byte\n";
-    std::cout << "long          : " << sizeof(long) << " byte\n";
-    std::cout << "long long     : " << sizeof(long long) << " byte\n";
-    std::cout << "float         : " << sizeof(float) << " byte\n";
-    std::cout << "double        : " << sizeof(double) << " byte\n";
-    std::cout << "unsigned int  : " << sizeof(unsigned int) << " byte\n";
-    std::cout << "unsigned char : " << sizeof(unsigned char) << " byte\n";
+    std::cout << "7 / 2  = " << totalDamage / hitCount << '\n';
+    std::cout << "7 % 2  = " << totalDamage % hitCount << '\n';
 
-    // long double のサイズは処理系で変わる
-    std::cout << "long double   : " << sizeof(long double) << " byte\n";
+    const int negative = -7;
+    std::cout << "-7 / 2 = " << negative / hitCount << '\n';
+    std::cout << "-7 % 2 = " << negative % hitCount << '\n';
+    std::cout << "7 / -2 = " << totalDamage / -hitCount << '\n';
+    std::cout << "7 % -2 = " << totalDamage % -hitCount << '\n';
 
-    // サイズを規格で固定した整数型。セーブデータや通信で使う
-    std::cout << "int32_t       : " << sizeof(std::int32_t) << " byte\n";
+    std::cout << "7 / 2.0 = " << 7 / 2.0 << '\n';
 
-    // sizeof は型名ではなく変数に適用すると、型を変えても自動で追従する
-    const float playerSpeed = 4.5f;
-    std::cout << "playerSpeed   : " << sizeof(playerSpeed) << " byte\n";
+    const double exactRatio = static_cast<double>(totalDamage) / hitCount;
+    std::cout << "static_cast<double>(7) / 2 = " << exactRatio << '\n';
 
-    // =====================================================
-    // 各型が表せる範囲を確認する
-    // =====================================================
-    std::cout << "\n=2= numeric_limits\n";
+    const double wrongRatio = static_cast<double>(totalDamage / hitCount);
+    std::cout << "static_cast<double>(7 / 2) = " << wrongRatio << '\n';
 
-    std::cout << "int min : " << std::numeric_limits<int>::min() << '\n';
-    std::cout << "int max : " << std::numeric_limits<int>::max() << '\n';
-    std::cout << "unsigned int min : " << std::numeric_limits<unsigned int>::min() << '\n';
-    std::cout << "unsigned int max : " << std::numeric_limits<unsigned int>::max() << '\n';
+    std::cout << "static_cast<int>(3.9)  = " << static_cast<int>(3.9) << '\n';
+    std::cout << "static_cast<int>(-3.9) = " << static_cast<int>(-3.9) << '\n';
 
-    // =====================================================
-    // 符号なし整数は 0 を下回ると最大値側から回り込む
-    // =====================================================
-    std::cout << "\n=3= unsigned wraparound\n";
+    const int currentHp = 7;
+    const int maxHp = 200;
+    const int percentScale = 100;
+    std::cout << "bad  percent = " << currentHp / maxHp * percentScale << '\n';
+    std::cout << "good percent = " << currentHp * percentScale / maxHp << '\n';
 
-    const unsigned int unsignedHitPoint = 100;
-    const int signedHitPoint = 100;
-    const int damage = 150;
+    // =========================================================
+    std::cout << "==============\n";
+    // =========================================================
 
-    std::cout << "unsigned 100 - 150 : " << (unsignedHitPoint - damage) << '\n';
-    std::cout << "signed   100 - 150 : " << (signedHitPoint - damage) << '\n';
+    const int totalExp = 2500;
+    const int expPerLevel = 400;
 
-    // =====================================================
-    // float は値が大きくなると、足した分が丸めで消える
-    // =====================================================
-    std::cout << "\n=4= float absorption\n";
+    std::cout << "レベル:" << totalExp / expPerLevel << "\n";
+    std::cout << "次のレベルまで " << expPerLevel - (totalExp % expPerLevel) << " EXP\n";
+    std::cout << "達成率:" << static_cast<double>(totalExp % expPerLevel) / expPerLevel << "\n";
 
-    std::cout << std::setprecision(10) << std::boolalpha;
+    // =========================================================
+    std::cout << "==============\n";
+    // =========================================================
+    // x が負のとき、タイル番号が本来より1つ大きい側にズレる。
+    // 0番のタイルだけ -31～31 の63個分になり、他の32個分より広くなる
 
-    // 10 進の 0.1 や 0.2 は 2 進数で正確に表せないので、足した結果もずれる
-    std::cout << "0.1 + 0.2 == 0.3 (double) : " << (0.1 + 0.2 == 0.3) << '\n';
+    const int tileSize = 32;
+    const std::vector<int> positions = { -33, -32, -31, -1, 0, 1, 31, 32, 33 };
 
-    const float frameTime = 0.016f;
+    std::cout << "x\ttitle\n";
 
-    const float time1 = 1.0f;
-    const float time2 = 10000.0f;
-    const float time3 = 100000.0f;
-    const float time4 = 200000.0f;
-    const float time5 = 500000.0f;
-    const float time6 = 1000000.0f;
+    for (std::size_t i = 0; i < positions.size(); i++)
+    {
+        const int position = positions[i];
+        const int plainIndex = position / tileSize;
 
-    std::cout << "1.0f       : " << (time1 + frameTime)
-        << "  changed? " << (time1 + frameTime != time1) << '\n';
-    std::cout << "10000.0f   : " << (time2 + frameTime)
-        << "  changed? " << (time2 + frameTime != time2) << '\n';
-    std::cout << "100000.0f  : " << (time3 + frameTime)
-        << "  changed? " << (time3 + frameTime != time3) << '\n';
-    std::cout << "200000.0f  : " << (time4 + frameTime)
-        << "  changed? " << (time4 + frameTime != time4) << '\n';
-    std::cout << "500000.0f  : " << (time5 + frameTime)
-        << "  changed? " << (time5 + frameTime != time5) << '\n';
-    std::cout << "1000000.0f : " << (time6 + frameTime)
-        << "  changed? " << (time6 + frameTime != time6) << '\n';
+        std::cout << position << '\t' << plainIndex << '\n';
+    }
 
-    // =====================================================
-    // マジックナンバーを名前付き定数にする
-    // =====================================================
-    std::cout << "\n=5= named constants\n";
+    // =========================================================
+    std::cout << "==============\n";
+    // =========================================================
 
-    const std::int32_t maxHitPoint = 100;
-    const std::int32_t baseDamage = 30;
-    const float damageRate = 0.5f;
+    const int itemsPerPage = 10;
+    const std::vector<int> sampleCounts = { 0, 1, 9, 10, 11, 20, 23 };
 
-    const float dealtDamage = baseDamage * damageRate;
-    const float remainingHitPoint = maxHitPoint - dealtDamage;
-    std::cout << "remainingHitPoint : " << remainingHitPoint << '\n';
+    std::cout << "items\tplain\tceil\n";
+
+    for (std::size_t i = 0; i < sampleCounts.size(); i++)
+    {
+        const int itemCount = sampleCounts[i];
+        const int plainPageCount = itemCount / itemsPerPage;
+        const int ceilPageCount = (itemCount + itemsPerPage - 1) / itemsPerPage;
+
+        std::cout << itemCount << '\t' << plainPageCount << '\t' << ceilPageCount << '\n';
+    }
 
     return 0;
 }
