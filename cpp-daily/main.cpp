@@ -1,88 +1,140 @@
-// =========================================================
-// Day2:®”‚ÆŠ„‚èZ‚Æstatic_cast
+ï»¿// =========================================================
+// Day3:é–¢æ•°ã¨å€¤æ¸¡ã—
 //
-// §ìÒ:h		“ú•tF11/14
+// åˆ¶ä½œè€…:h		æ—¥ä»˜ï¼š11/16
 // =========================================================
 #include <iostream>
-#include <vector>
+#include <cstdlib>
+
+int turnCount = 0;
+
+// æ”»æ’ƒåŠ›ã¨é˜²å¾¡åŠ›ã‹ã‚‰ä¸ãˆã‚‹ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’è¨ˆç®—ã™ã‚‹
+int calculateDamage(int attack, int defense)
+{
+    int damage = attack - defense;
+    if (damage < 1) {
+        return 1; // ãƒ€ãƒ¡ãƒ¼ã‚¸ã¯æœ€ä½1
+    }
+    return damage;
+}
+
+// æ®‹ã‚ŠHPã‚’å‰²åˆï¼ˆ0.0ã€œ1.0ï¼‰ã§è¿”ã™
+double calculateHpRatio(int currentHp, int maxHp)
+{
+    return static_cast<double>(currentHp) / maxHp;
+}
+
+// å—ã‘å–ã£ãŸHPã‹ã‚‰ damage ã‚’å¼•ã„ãŸå€¤ã‚’è¿”ã™ï¼ˆå‘¼ã³å‡ºã—å´ã®HPã¯å¤‰ãˆãªã„ï¼‰
+int applyDamage(int hp, int damage)
+{
+    hp = hp - damage;
+    if (hp < 0) {
+        return 0;
+    }
+    return hp;  
+}
+
+int healPlayer(int hp, int healAmount)
+{
+    hp = hp + healAmount;
+    if (hp > 100)
+    {
+        return 100;
+    }
+    return hp;
+}
+
+int nextTurn()
+{
+    turnCount = turnCount + 1;
+    return turnCount;
+}
+
+int nextTurnLocal()
+{
+    int localCount = 0;
+    localCount = localCount + 1;
+    return localCount;
+}
+
+int attackTo(int num, int atk, int def)
+{
+    int damege;
+    if (num == 1)
+    {
+        damege = atk * 2 - def;
+        if (damege < 1) damege = 1;
+        return damege;
+    }
+    else
+    {
+        damege = atk - def;
+        if (damege < 1) damege = 1;
+        return damege;
+    }
+}
+
+int eHpAfter(int eHp, int damege)
+{
+    eHp = eHp - damege;
+    if (eHp < 0) eHp = 0;
+    return eHp;
+}
 
 int main()
 {
-    const int totalDamage = 7;
-    const int hitCount = 2;
+    int playerHp        = 100;
+    int enemyAttack     = 34;
+    int playerDefense   = 12;
 
-    std::cout << "7 / 2  = " << totalDamage / hitCount << '\n';
-    std::cout << "7 % 2  = " << totalDamage % hitCount << '\n';
+    int damage = calculateDamage(enemyAttack, playerDefense);
+    std::cout << "damage = " << damage << '\n';
 
-    const int negative = -7;
-    std::cout << "-7 / 2 = " << negative / hitCount << '\n';
-    std::cout << "-7 % 2 = " << negative % hitCount << '\n';
-    std::cout << "7 / -2 = " << totalDamage / -hitCount << '\n';
-    std::cout << "7 % -2 = " << totalDamage % -hitCount << '\n';
+    int hpAfter = applyDamage(playerHp, damage);
+    std::cout << "returned hp = " << hpAfter << '\n';
+    std::cout << "playerHp (caller) = " << playerHp << '\n';
 
-    std::cout << "7 / 2.0 = " << 7 / 2.0 << '\n';
+    playerHp = hpAfter;
+    std::cout << "hp ratio = " << calculateHpRatio(playerHp, 100) << '\n';
 
-    const double exactRatio = static_cast<double>(totalDamage) / hitCount;
-    std::cout << "static_cast<double>(7) / 2 = " << exactRatio << '\n';
-
-    const double wrongRatio = static_cast<double>(totalDamage / hitCount);
-    std::cout << "static_cast<double>(7 / 2) = " << wrongRatio << '\n';
-
-    std::cout << "static_cast<int>(3.9)  = " << static_cast<int>(3.9) << '\n';
-    std::cout << "static_cast<int>(-3.9) = " << static_cast<int>(-3.9) << '\n';
-
-    const int currentHp = 7;
-    const int maxHp = 200;
-    const int percentScale = 100;
-    std::cout << "bad  percent = " << currentHp / maxHp * percentScale << '\n';
-    std::cout << "good percent = " << currentHp * percentScale / maxHp << '\n';
+    std::cout << "weak attack damage = " << calculateDamage(5, 99) << '\n';
 
     // =========================================================
-    std::cout << "==============\n";
+    std::cout << "==========\n";
     // =========================================================
 
-    const int totalExp = 2500;
-    const int expPerLevel = 400;
-
-    std::cout << "ƒŒƒxƒ‹:" << totalExp / expPerLevel << "\n";
-    std::cout << "Ÿ‚ÌƒŒƒxƒ‹‚Ü‚Å " << expPerLevel - (totalExp % expPerLevel) << " EXP\n";
-    std::cout << "’B¬—¦:" << static_cast<double>(totalExp % expPerLevel) / expPerLevel << "\n";
+    int hp = 80;
+    int healhp = healPlayer(80, 30);
+    std::cout << "hp:" << hp << " healhp :" << healhp << "\n";
 
     // =========================================================
-    std::cout << "==============\n";
+    std::cout << "==========\n";
     // =========================================================
-    // x ‚ª•‰‚Ì‚Æ‚«Aƒ^ƒCƒ‹”Ô†‚ª–{—ˆ‚æ‚è1‚Â‘å‚«‚¢‘¤‚ÉƒYƒŒ‚éB
-    // 0”Ô‚Ìƒ^ƒCƒ‹‚¾‚¯ -31`31 ‚Ì63ŒÂ•ª‚É‚È‚èA‘¼‚Ì32ŒÂ•ª‚æ‚èL‚­‚È‚é
 
-    const int tileSize = 32;
-    const std::vector<int> positions = { -33, -32, -31, -1, 0, 1, 31, 32, 33 };
+    int first    = nextTurn();
+    int second   = nextTurn();
+    int third    = nextTurn();
+    std::cout << "gloval: " << first << ' ' << second << ' ' << third << "\n";
 
-    std::cout << "x\ttitle\n";
+    int a = nextTurnLocal();
+    int b = nextTurnLocal();
+    int c = nextTurnLocal();
+    std::cout << "local: " << a << ' ' << b << ' ' << c << '\n';
 
-    for (std::size_t i = 0; i < positions.size(); i++)
+    // =========================================================
+    std::cout << "==========\n";
+    // =========================================================
+    int enemyHp = 100;
+    int eMaXHp = 100;
+    int playerAttack = 34;
+    int enemyDefense = 12;
+
+    for (int i = 0; i < 3; i++)
     {
-        const int position = positions[i];
-        const int plainIndex = position / tileSize;
-
-        std::cout << position << '\t' << plainIndex << '\n';
-    }
-
-    // =========================================================
-    std::cout << "==============\n";
-    // =========================================================
-
-    const int itemsPerPage = 10;
-    const std::vector<int> sampleCounts = { 0, 1, 9, 10, 11, 20, 23 };
-
-    std::cout << "items\tplain\tceil\n";
-
-    for (std::size_t i = 0; i < sampleCounts.size(); i++)
-    {
-        const int itemCount = sampleCounts[i];
-        const int plainPageCount = itemCount / itemsPerPage;
-        const int ceilPageCount = (itemCount + itemsPerPage - 1) / itemsPerPage;
-
-        std::cout << itemCount << '\t' << plainPageCount << '\t' << ceilPageCount << '\n';
+        int num = rand() % 2;
+        int damage2 = attackTo(num, playerAttack, enemyDefense);
+        enemyHp = eHpAfter(enemyHp, damage2);
+        std::cout << "hp%" << static_cast<double>(enemyHp) / eMaXHp << "\n";
     }
 
     return 0;
