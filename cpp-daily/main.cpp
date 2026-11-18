@@ -1,141 +1,147 @@
 ﻿// =========================================================
-// Day3:関数と値渡し
+// Day4:配列と std::array
 //
-// 制作者:h		日付：11/16
+// 制作者:h		日付：11/18
 // =========================================================
+#include <array>
 #include <iostream>
-#include <cstdlib>
 
-int turnCount = 0;
+const int kEnemyCount = 4;
 
-// 攻撃力と防御力から与えるダメージを計算する
-int calculateDamage(int attack, int defense)
+// 生配列を受け取る関数（
+void printRawArraySize(int values[])
 {
-    int damage = attack - defense;
-    if (damage < 1) {
-        return 1; // ダメージは最低1
+    std::cout << "  関数の中の sizeof(values) = " << sizeof(values) << '\n';
+}
+
+// std::array を値で受け取る関数
+void printTotalHp(std::array<int, 4> enemyHpList)
+{
+    int total = 0;
+    for (std::size_t i = 0; i < enemyHpList.size(); ++i) {
+        total += enemyHpList[i];
     }
-    return damage;
+    std::cout << "  合計HP = " << total << '\n';
 }
 
-// 残りHPを割合（0.0〜1.0）で返す
-double calculateHpRatio(int currentHp, int maxHp)
+// std::array を値で受け取って書き換える関数（呼び出し元に影響するか確認）
+void damageAll(std::array<int, 4> enemyHpList)
 {
-    return static_cast<double>(currentHp) / maxHp;
-}
-
-// 受け取ったHPから damage を引いた値を返す（呼び出し側のHPは変えない）
-int applyDamage(int hp, int damage)
-{
-    hp = hp - damage;
-    if (hp < 0) {
-        return 0;
+    for (std::size_t i = 0; i < enemyHpList.size(); ++i) {
+        enemyHpList[i] -= 10;
     }
-    return hp;  
+    std::cout << "  関数の中の先頭HP = " << enemyHpList[0] << '\n';
 }
 
-int healPlayer(int hp, int healAmount)
+int countAliveEnemies(std::array<int, kEnemyCount> enemyHpList)
 {
-    hp = hp + healAmount;
-    if (hp > 100)
+    int aliveCount = 0;
+    for (std::size_t i = 0; i < enemyHpList.size(); ++i) {
+        // TODO: HPが1以上なら aliveCount を増やす
+        if (enemyHpList[i] > 0)
+        {
+            aliveCount += 1;
+        }
+    }
+    return aliveCount;
+}
+
+int findLowestHpIndex(std::array<int, kEnemyCount> enemyHpList)
+{
+    // TODO: 暫定の最小を決めて、2番目以降と比べていく
+    int minHp = enemyHpList[0];
+    for (size_t i = 0; i < enemyHpList.size(); ++i)
     {
-        return 100;
+        if (minHp > enemyHpList[i])
+        {
+            minHp = enemyHpList[i];
+        }
     }
-    return hp;
-}
 
-int nextTurn()
-{
-    turnCount = turnCount + 1;
-    return turnCount;
-}
-
-int nextTurnLocal()
-{
-    int localCount = 0;
-    localCount = localCount + 1;
-    return localCount;
-}
-
-int attackTo(int num, int atk, int def)
-{
-    int damege;
-    if (num == 1)
-    {
-        damege = atk * 2 - def;
-        if (damege < 1) damege = 1;
-        return damege;
-    }
-    else
-    {
-        damege = atk - def;
-        if (damege < 1) damege = 1;
-        return damege;
-    }
-}
-
-int eHpAfter(int eHp, int damege)
-{
-    eHp = eHp - damege;
-    if (eHp < 0) eHp = 0;
-    return eHp;
+    return minHp;
 }
 
 int main()
 {
-    int playerHp        = 100;
-    int enemyAttack     = 34;
-    int playerDefense   = 12;
+    // --- 生配列 ---
+    int rawHpList[kEnemyCount] = { 100, 80, 50, 30 };
 
-    int damage = calculateDamage(enemyAttack, playerDefense);
-    std::cout << "damage = " << damage << '\n';
+    std::cout << "[生配列]\n";
+    std::cout << "  sizeof(rawHpList)    = " << sizeof(rawHpList) << '\n';
+    std::cout << "  sizeof(rawHpList[0]) = " << sizeof(rawHpList[0]) << '\n';
+    std::cout << "  要素数(割り算で計算)  = "
+        << sizeof(rawHpList) / sizeof(rawHpList[0]) << '\n';
+    printRawArraySize(rawHpList);
 
-    int hpAfter = applyDamage(playerHp, damage);
-    std::cout << "returned hp = " << hpAfter << '\n';
-    std::cout << "playerHp (caller) = " << playerHp << '\n';
+    // --- std::array ---
+    std::array<int, kEnemyCount> hpList = { 100, 80, 50, 30 };
 
-    playerHp = hpAfter;
-    std::cout << "hp ratio = " << calculateHpRatio(playerHp, 100) << '\n';
+    std::cout << "[std::array]\n";
+    std::cout << "  sizeof(hpList) = " << sizeof(hpList) << '\n';
+    std::cout << "  hpList.size()  = " << hpList.size() << '\n';
+    std::cout << "  hpList[2]      = " << hpList[2] << '\n';
+    printTotalHp(hpList);
 
-    std::cout << "weak attack damage = " << calculateDamage(5, 99) << '\n';
+    std::cout << "[値渡しの確認]\n";
+    damageAll(hpList);
+    std::cout << "  呼び出し元の先頭HP = " << hpList[0] << '\n';
 
-    // =========================================================
-    std::cout << "==========\n";
-    // =========================================================
-
-    int hp = 80;
-    int healhp = healPlayer(80, 30);
-    std::cout << "hp:" << hp << " healhp :" << healhp << "\n";
-
-    // =========================================================
-    std::cout << "==========\n";
-    // =========================================================
-
-    int first    = nextTurn();
-    int second   = nextTurn();
-    int third    = nextTurn();
-    std::cout << "gloval: " << first << ' ' << second << ' ' << third << "\n";
-
-    int a = nextTurnLocal();
-    int b = nextTurnLocal();
-    int c = nextTurnLocal();
-    std::cout << "local: " << a << ' ' << b << ' ' << c << '\n';
-
-    // =========================================================
-    std::cout << "==========\n";
-    // =========================================================
-    int enemyHp = 100;
-    int eMaXHp = 100;
-    int playerAttack = 34;
-    int enemyDefense = 12;
-
-    for (int i = 0; i < 3; i++)
-    {
-        int num = rand() % 2;
-        int damage2 = attackTo(num, playerAttack, enemyDefense);
-        enemyHp = eHpAfter(enemyHp, damage2);
-        std::cout << "hp%" << static_cast<double>(enemyHp) / eMaXHp << "\n";
+    // --- 平均HP（Day 2 の整数の割り算と static_cast の復習） ---
+    int total = 0;
+    for (std::size_t i = 0; i < hpList.size(); ++i) {
+        total += hpList[i];
     }
+    const double average =
+        static_cast<double>(total) / static_cast<double>(hpList.size());
+    std::cout << "[平均]\n";
+    std::cout << "  平均HP = " << average << '\n';
+
+    // =========================================================
+    std::cout << "=========\n";
+    // =========================================================
+
+    std::array<int, 5> itemList = { 2,3,1,4,5 };
+
+    int addItem = 0;
+    int maxList = itemList[0];
+
+    for (size_t i = 0; i < itemList.size(); ++i)
+    {
+        addItem += itemList[i];
+
+        if (maxList < itemList[i])
+        {
+            maxList = itemList[i];
+        }
+    }
+
+    std::cout << "合計個数:" << addItem << "\n";
+    std::cout << "一番多いアイテム:" << maxList << "\n";
+
+    // =========================================================
+    std::cout << "=========\n";
+    // =========================================================
+
+    //std::array<int, 4> mpList = { 10, 20, 30, 40 };
+
+    //std::cout << "書き換え前の mpList[0] = " << mpList[0] << '\n';
+    //for (int i = 0; i < 5; ++i) {   // わざと1個多い
+    //    hpList[i] = 0;
+    //}
+    //std::cout << "書き換え後の mpList[0] = " << mpList[0] << '\n';
+
+    std::array<int, 0> emptyList = {};
+    std::cout << "size()     = " << emptyList.size() << '\n';
+    std::cout << "size() - 1 = " << emptyList.size() - 1 << '\n';
+
+    // =========================================================
+    std::cout << "=========\n";
+    // =========================================================
+
+    std::array<int, kEnemyCount> enemyHpList = { 100, 5, 50, 30 };
+
+    std::cout << "生存数 = " << countAliveEnemies(enemyHpList) << '\n';
+    std::cout << "最弱の添字 = " << findLowestHpIndex(enemyHpList) << '\n';
 
     return 0;
 }
